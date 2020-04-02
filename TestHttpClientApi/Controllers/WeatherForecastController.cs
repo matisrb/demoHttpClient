@@ -92,8 +92,8 @@ namespace TestHttpClientApi.Controllers
 
             sw.Stop();
 
-            return $"Elapsed {Math.Round(sw.ElapsedMilliseconds / 1000.0, 2, MidpointRounding.AwayFromZero)}s " +
-                   $"for {lenght} requests " +
+            return $"Elapsed {Math.Round(sw.ElapsedMilliseconds / 1000.0, 2, MidpointRounding.AwayFromZero)}s {Environment.NewLine}" +
+                   $"for {lenght} requests {Environment.NewLine}" +
                    $"IP: {ips.FirstOrDefault()}";
         }        
 
