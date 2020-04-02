@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TestHttpClientApi.Common;
 
-namespace TestHttpClientApi.HttpHanders
+namespace TestHttpClientApi.HttpHandlers
 {
     public class LoggingHandler : DelegatingHandler
     {

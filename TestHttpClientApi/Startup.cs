@@ -15,7 +15,7 @@ using Polly;
 using Polly.Extensions.Http;
 using TestHttpClientApi.Agents;
 using TestHttpClientApi.Common;
-using TestHttpClientApi.HttpHanders;
+using TestHttpClientApi.HttpHandlers;
 
 namespace TestHttpClientApi
 {
