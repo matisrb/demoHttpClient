@@ -16,6 +16,7 @@ using Polly.Extensions.Http;
 using TestHttpClientApi.Agents;
 using TestHttpClientApi.Common;
 using TestHttpClientApi.HttpHanders;
+using Serilog;
 
 namespace TestHttpClientApi
 {
@@ -38,6 +39,8 @@ namespace TestHttpClientApi
             services.AddTransient<LoggingHandler>();
 
             services.AddTransient<IAppCustom, CustomApp>();
+
+            services.AddSingleton(Log.Logger);
 
             #endregion
 
@@ -159,6 +162,8 @@ namespace TestHttpClientApi
             }
 
             app.UseHttpsRedirection();
+
+            app.UseSerilogRequestLogging(); //Serilog will logg every request made
 
             app.UseRouting();
 

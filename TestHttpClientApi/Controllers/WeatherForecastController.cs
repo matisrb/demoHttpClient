@@ -6,9 +6,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using TestHttpClientApi.Agents;
 using TestHttpClientApi.Common;
+using Serilog;
 
 namespace TestHttpClientApi.Controllers
 {
@@ -16,22 +16,27 @@ namespace TestHttpClientApi.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {        
-        private readonly IAffirmationsService _affirmationsService;
-
+        readonly IAffirmationsService _affirmationsService;
         readonly IHttpClientFactory _httpClientFactory;
+        readonly ILogger _logger;
 
         public WeatherForecastController(IAffirmationsService affirmationsService,
-                                         IHttpClientFactory httpClientFactory)
+                                         IHttpClientFactory httpClientFactory,
+                                         ILogger logger)
         {
             _httpClientFactory = httpClientFactory;
 
             _affirmationsService = affirmationsService;
+
+            _logger = logger;
         }
 
         //0. Dummy
         [HttpGet("{abc}/dummy")]
         public async Task<string> GetDummy()
         {
+
+            _logger.Information("Log Message from dummy request");
             var ips = await Dns.GetHostAddressesAsync("www.google.com");
 
             var sw = Stopwatch.StartNew();
@@ -56,6 +61,8 @@ namespace TestHttpClientApi.Controllers
         [HttpGet("{abc}/factory/basic")]
         public async Task<string> GetBasicFactory()
         {
+            _logger.Information("Log Message from factory/basic request");
+
             var ips = await Dns.GetHostAddressesAsync("www.google.com");
 
             var sw = Stopwatch.StartNew();
