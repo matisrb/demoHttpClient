@@ -65,6 +65,10 @@ namespace TestHttpClientApi.Controllers
 
             var ips = await Dns.GetHostAddressesAsync("www.google.com");
 
+            //Global exception handling testing purpose
+            int p = 0;
+            var pp = 1 / p;
+
             var sw = Stopwatch.StartNew();
 
             int length = 20;

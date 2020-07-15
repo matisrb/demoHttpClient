@@ -17,6 +17,12 @@ using TestHttpClientApi.Agents;
 using TestHttpClientApi.Common;
 using TestHttpClientApi.HttpHandlers;
 using Serilog;
+using TestHttpClientApi.Logging;
+using Microsoft.AspNetCore.Diagnostics;
+using System.Diagnostics;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
+using System.Text;
 
 namespace TestHttpClientApi
 {
@@ -32,7 +38,7 @@ namespace TestHttpClientApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();            
+            services.AddControllers();              
 
             #region Register types
 
@@ -140,6 +146,12 @@ namespace TestHttpClientApi
             //  .SetHandlerLifetime(TimeSpan.FromMinutes(10));
 
             #endregion
+
+            //2. Global exception handling
+            services.AddMvc(options =>
+            {
+                options.Filters.Add<ErrorHandlingFilter>();
+            });
         }
 
         #region Helper Methods
@@ -164,10 +176,39 @@ namespace TestHttpClientApi
             app.UseHttpsRedirection();
 
             app.UseSerilogRequestLogging(); //Serilog will logg every request made
+            //app.UseMiddleware<SerilogMiddleware>();
 
             app.UseRouting();
 
             app.UseAuthorization();
+
+            //1. example Global exception handling 
+            //app.UseExceptionHandler(errorApp =>
+            //{
+            //    errorApp.Run(async context =>
+            //    {
+            //        context.Response.StatusCode = 500;
+            //        context.Response.ContentType = "application/json";
+
+            //        var errorCtx = context.Features.Get<IExceptionHandlerFeature>();
+            //        if (errorCtx != null)
+            //        {
+            //            var exc = errorCtx.Error;
+            //            var errorId = Activity.Current?.Id ?? context.TraceIdentifier;
+
+            //            Log.Logger.Error(exc, $"ErrorId: {errorId}");
+
+            //            var jsonResponse = JsonConvert.SerializeObject(new CustomErrorResponse
+            //            {
+            //                ErrorId = errorId,
+            //                Message = "Some kind of error happend in the API."
+            //            });
+            //            await context.Response.WriteAsync(jsonResponse, Encoding.UTF8);
+            //        }
+            //    });
+            //});
+
+
 
             app.UseEndpoints(endpoints =>
             {
