@@ -156,10 +156,10 @@ namespace TestHttpClientApi
             #endregion
 
             //2. Global exception handling
-            services.AddMvc(options =>
-            {
-                options.Filters.Add<ErrorHandlingFilter>();
-            });
+            //services.AddMvc(options =>
+            //{
+            //    options.Filters.Add<ErrorHandlingFilter>();
+            //});
         }
 
         #region Helper Methods
@@ -215,7 +215,7 @@ namespace TestHttpClientApi
             //        }
             //    });
             //});
-
+            app.ConfigureExceptionHandler(Log.Logger);
 
 
             app.UseEndpoints(endpoints =>
