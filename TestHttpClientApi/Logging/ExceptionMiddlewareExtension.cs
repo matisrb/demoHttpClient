@@ -29,7 +29,7 @@ namespace TestHttpClientApi.Logging
                         var exc = errorCtx.Error;
                         var errorId = Activity.Current?.Id ?? context.TraceIdentifier;
 
-                        Log.Logger.Error(exc, $"ErrorId: {errorId}");
+                        logger.Error(exc, $"Some kind of error happend in the API. ErrorId: {errorId}");
 
                         var jsonResponse = JsonConvert.SerializeObject(new CustomErrorResponse
                         {
