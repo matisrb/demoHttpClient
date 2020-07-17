@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Serilog;
+using Serilog.Core;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,16 +13,17 @@ using TestHttpClientApi.Common;
 
 namespace TestHttpClientApi.CommandHandlers
 {
-    public sealed class SendToGoogleClientFactoryHandler : ICommandHandler<SendToGoogleCommand>
+    public sealed class SendToGoogleClientFactoryHandler : CommandHandlerBase<SendToGoogleCommand>
     {
         readonly IHttpClientFactory _httpClientFactory;
 
-        public SendToGoogleClientFactoryHandler(IHttpClientFactory httpClientFactory)
+        public SendToGoogleClientFactoryHandler(IHttpClientFactory httpClientFactory, ILogger logger) 
+            : base(logger)
         {
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<string> HandleAsync(SendToGoogleCommand command)
+        protected override async Task<string> OnHandle(SendToGoogleCommand command)
         {
             var ips = await Dns.GetHostAddressesAsync("www.google.com");
 
