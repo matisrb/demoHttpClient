@@ -13,7 +13,7 @@ using TestHttpClientApi.Common;
 
 namespace TestHttpClientApi.CommandHandlers
 {
-    public sealed class SendToGoogleClientFactoryHandler : CommandHandlerBase<SendToGoogleCommand>
+    public sealed class SendToGoogleClientFactoryHandler : CommandHandlerTest<SendToGoogleCommand> 
     {
         readonly IHttpClientFactory _httpClientFactory;
 

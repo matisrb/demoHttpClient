@@ -20,13 +20,13 @@ namespace TestHttpClientApi.CommandHandlers.Interfaces
         {
             _logger.Information($"Handler started {GetType()} handling command: {command.GetType()}");
             
-            var result = await OnHandle(command);
+            var result = await OnHandleBase(command);
 
             _logger.Information($"Handler {GetType()} ended handling command: {command.GetType()}");
 
             return result;
         }
 
-        protected abstract Task<string> OnHandle(TCommand command);
+        protected abstract Task<string> OnHandleBase(TCommand command);
     }
 }
