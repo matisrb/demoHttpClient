@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using TestHttpClientApi.Agents;
 using TestHttpClientApi.Common;
 using Serilog;
+using TestHttpClientApi.Commands;
+using TestHttpClientApi.Dispatcher;
 
 namespace TestHttpClientApi.Controllers
 {
@@ -19,16 +21,20 @@ namespace TestHttpClientApi.Controllers
         readonly IAffirmationsService _affirmationsService;
         readonly IHttpClientFactory _httpClientFactory;
         readonly ILogger _logger;
+        readonly Messages _messages;
 
         public WeatherForecastController(IAffirmationsService affirmationsService,
                                          IHttpClientFactory httpClientFactory,
-                                         ILogger logger)
+                                         ILogger logger,
+                                         Messages messages)
         {
             _httpClientFactory = httpClientFactory;
 
             _affirmationsService = affirmationsService;
 
             _logger = logger;
+
+            _messages = messages;
         }
 
         //0. Dummy
@@ -86,26 +92,18 @@ namespace TestHttpClientApi.Controllers
         }
 
         //2. Factory Named clients
+        //OVAJ
         [HttpGet("{abc}/factory/named")]
         public async Task<string> GetFactory()
         {
-            var ips = await Dns.GetHostAddressesAsync("www.google.com");
-
-            var sw = Stopwatch.StartNew();
-
-            int lenght = 10;
-            for (int i = 0; i < lenght; i++)
+            var command = new SendToGoogleCommand 
             {
-                var client = _httpClientFactory.CreateClient(ApiConstants.GoogleClient);
+                Messages = "some message Bla" 
+            };
 
-                var result = await client.GetAsync("");
-            }
+            var result = await _messages.Dispatch<string>(command);
 
-            sw.Stop();
-
-            return $"Elapsed {Math.Round(sw.ElapsedMilliseconds / 1000.0, 2, MidpointRounding.AwayFromZero)}s {Environment.NewLine}" +
-                   $"for {lenght} requests {Environment.NewLine}" +
-                   $"IP: {ips.FirstOrDefault()}";
+            return result;              
         }        
 
         //3. Factory Typed clients

@@ -23,6 +23,10 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using System.Text;
+using TestHttpClientApi.Dispatcher;
+using TestHttpClientApi.CommandHandlers.Interfaces;
+using TestHttpClientApi.Commands;
+using TestHttpClientApi.CommandHandlers;
 
 namespace TestHttpClientApi
 {
@@ -47,6 +51,10 @@ namespace TestHttpClientApi
             services.AddTransient<IAppCustom, CustomApp>();
 
             services.AddSingleton(Log.Logger);
+
+            //Handlers
+            services.AddTransient<ICommandHandler<SendToGoogleCommand>, SendToGoogleClientFactoryHandler>();
+            services.AddSingleton<Messages>();
 
             #endregion
 
