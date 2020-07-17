@@ -18,13 +18,13 @@ namespace TestHttpClientApi.CommandHandlers.Interfaces
             _logger = logger;
         }
 
-        protected abstract Task<string> OnHandle(TCommand command);
+        protected abstract Task<string> OnHandleTest(TCommand command);
 
         protected override async Task<string> OnHandleBase(TCommand command)
         {
             _logger.Information($"LOG from CommandHandlerTest");
 
-            var result = await OnHandle(command);
+            var result = await OnHandleTest(command);
 
             return result;
         }

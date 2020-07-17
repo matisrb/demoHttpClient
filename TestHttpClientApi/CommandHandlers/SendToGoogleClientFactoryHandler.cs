@@ -23,7 +23,7 @@ namespace TestHttpClientApi.CommandHandlers
             _httpClientFactory = httpClientFactory;
         }
 
-        protected override async Task<string> OnHandle(SendToGoogleCommand command)
+        protected override async Task<string> OnHandleTest(SendToGoogleCommand command)
         {
             var ips = await Dns.GetHostAddressesAsync("www.google.com");
 
