@@ -27,6 +27,10 @@ using TestHttpClientApi.Dispatcher;
 using TestHttpClientApi.CommandHandlers.Interfaces;
 using TestHttpClientApi.Commands;
 using TestHttpClientApi.CommandHandlers;
+using TestHttpClientApi.Services;
+using System.Threading.Channels;
+using TestHttpClientApi.Services.Command;
+using Greet;
 
 namespace TestHttpClientApi
 {
@@ -58,7 +62,8 @@ namespace TestHttpClientApi
 
             #endregion
 
-            //Adds the System.Net.Http.IHttpClientFactory and related services to the Microsoft.Extensions.DependencyInjection.IServiceCollection.
+            //Adds the System.Net.Http.IHttpClientFactory and 
+            //related services to the Microsoft.Extensions.DependencyInjection.IServiceCollection.
 
             #region Basic Client Usage
 
@@ -144,7 +149,6 @@ namespace TestHttpClientApi
 
             #endregion
 
-
             #region Forecast service
 
             //services.AddHttpClient<IWeatherForecastService, WeatherForecastService>(client =>
@@ -155,11 +159,25 @@ namespace TestHttpClientApi
 
             #endregion
 
-            //2. Global exception handling
-            //services.AddMvc(options =>
-            //{
-            //    options.Filters.Add<ErrorHandlingFilter>();
-            //});
+
+            #region channels
+            services.AddSingleton(Channel.CreateUnbounded<string>());
+            services.AddSingleton(Channel.CreateUnbounded<CommandTest>());
+            #endregion
+
+            #region Hosted services
+            services.AddHostedService<NotificationService>();
+            services.AddHostedService<ProcessService>();
+
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            #endregion
+
+            #region Grpc
+            services.AddGrpcClient<GreetingService.GreetingServiceClient>(client =>
+            {
+                client.Address = new Uri("http://localhost:50052");
+            });
+            #endregion
         }
 
         #region Helper Methods
@@ -183,38 +201,12 @@ namespace TestHttpClientApi
 
             app.UseHttpsRedirection();
 
-            app.UseSerilogRequestLogging(); //Serilog will logg every request made
-            //app.UseMiddleware<SerilogMiddleware>();
+            app.UseSerilogRequestLogging(); 
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseAuthorization();          
 
-            //1. example Global exception handling 
-            //app.UseExceptionHandler(errorApp =>
-            //{
-            //    errorApp.Run(async context =>
-            //    {
-            //        context.Response.StatusCode = 500;
-            //        context.Response.ContentType = "application/json";
-
-            //        var errorCtx = context.Features.Get<IExceptionHandlerFeature>();
-            //        if (errorCtx != null)
-            //        {
-            //            var exc = errorCtx.Error;
-            //            var errorId = Activity.Current?.Id ?? context.TraceIdentifier;
-
-            //            Log.Logger.Error(exc, $"ErrorId: {errorId}");
-
-            //            var jsonResponse = JsonConvert.SerializeObject(new CustomErrorResponse
-            //            {
-            //                ErrorId = errorId,
-            //                Message = "Some kind of error happend in the API."
-            //            });
-            //            await context.Response.WriteAsync(jsonResponse, Encoding.UTF8);
-            //        }
-            //    });
-            //});
             app.ConfigureExceptionHandler(Log.Logger);
 
 

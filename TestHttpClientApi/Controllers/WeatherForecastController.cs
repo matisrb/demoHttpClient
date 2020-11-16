@@ -11,6 +11,9 @@ using TestHttpClientApi.Common;
 using Serilog;
 using TestHttpClientApi.Commands;
 using TestHttpClientApi.Dispatcher;
+using System.Threading.Channels;
+using TestHttpClientApi.Services.Command;
+using Greet;
 
 namespace TestHttpClientApi.Controllers
 {
@@ -71,9 +74,11 @@ namespace TestHttpClientApi.Controllers
 
             var ips = await Dns.GetHostAddressesAsync("www.google.com");
 
+            #region exception test
             //Global exception handling testing purpose
-            int p = 0;
-            var pp = 1 / p;
+            //int p = 0;
+            //var pp = 1 / p;
+            #endregion
 
             var sw = Stopwatch.StartNew();
 
@@ -92,7 +97,6 @@ namespace TestHttpClientApi.Controllers
         }
 
         //2. Factory Named clients
-        //OVAJ
         [HttpGet("{abc}/factory/named")]
         public async Task<string> GetFactory()
         {
@@ -123,6 +127,48 @@ namespace TestHttpClientApi.Controllers
                    $"elapsed time: {Math.Round(sw.ElapsedMilliseconds/1000.0, 2, MidpointRounding.AwayFromZero) }s {Environment.NewLine}" +
                    $"IP: {ips.FirstOrDefault()}";
         }
-      
+
+        [HttpPost("sendMessage/{message}")]
+        public async Task<int> SendMessage([FromServices]Channel<string> channel, [FromRoute]string message)
+        {
+
+            await channel.Writer.WriteAsync(message);
+
+            return await Task.FromResult(1);
+        }
+
+        [HttpPost("sendMessageC/{cmd}")]
+        public async Task<int> SendMessageC([FromServices] Channel<CommandTest> channel, [FromRoute] int cmd)
+        {
+
+            await channel.Writer.WriteAsync(new CommandTest { CommandType = cmd});
+
+            return await Task.FromResult(1);
+        }
+
+        [HttpPost("sendMessageGrpc/{name}")]
+        public async Task<string> SendMessageG([FromServices] GreetingService.GreetingServiceClient greetingServiceClient, 
+                                               [FromRoute] string name)
+        {
+
+            GreetingResponse response;
+            try
+            {
+                response = await greetingServiceClient.GreetAsync(new GreetingRequest
+                {
+                    Greeting = new Greeting
+                    {
+                        FirstName = name,
+                        LastName = "Matic"
+                    }
+                });
+            }
+            catch (Exception exc)
+            {
+                throw;
+            }    
+
+            return await Task.FromResult(response.Result);
+        }
     }
 }
